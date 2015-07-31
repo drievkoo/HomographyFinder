@@ -1,0 +1,12 @@
+HomographyFinder
+
+
+Basic running setup
+------------------------------------------------
+Windows: double-click .exe file
+
+
+Additional Info
+------------------------------------------------
+project uses Qt5.5.0
+build using: MSVC2012 32bit

@@ -1,0 +1,1 @@
+-For release include OpenCV3 in subfolder (header files and required dll files).
