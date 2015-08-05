@@ -27,7 +27,10 @@ HEADERS  += mainwindow.h\
     homographyfinder.h \
     homographybuilder.h \
     griddrawer.h \
-    keyshortcutbinding.h
+    keyshortcutbinding.h \
+    iprojection.h \
+    igriddrawer.h \
+    abstractgriddrawer.h
 
 FORMS    += mainwindow.ui
 

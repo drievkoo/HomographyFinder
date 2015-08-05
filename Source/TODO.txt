@@ -2,3 +2,8 @@
 
 class mainwindow
 -add qstatus bar to output applied operations
+
+classes to be implemented:
+-virtual grid
+-abstractgriddrawer
+-griddrawer

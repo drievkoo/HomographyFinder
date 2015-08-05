@@ -16,9 +16,11 @@ public:
     GridDrawer(QWidget *parent = 0):QGLWidget(parent){
         setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
     }
+    
     ~GridDrawer(){
 
     }
+    
     cv::Mat drawGrid(cv::Mat image,VirtualGrid grid,cv::Point3d rotation,cv::Point3d translation){
         throw std::exception("Not implemented yet.");
         GLfloat rotation[3];
