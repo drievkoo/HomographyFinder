@@ -9,22 +9,16 @@ class Homography
 {
     cv::Mat homographyMatrix;
     cv::Mat inverseHomographyMatrix;
-    std::vector<cv::Point2f> plane1Points;
-    std::vector<cv::Point2f> plane2Points;
 
 public:
     Homography(std::vector<cv::Point2f> pPlane1Points,
                               std::vector<cv::Point2f> pPlane2Points){
-        plane1Points=pPlane1Points;
-        plane2Points=pPlane2Points;
-        if(plane1Points.size()!=plane2Points.size()||plane1Points.size()!=4)
+        if(pPlane1Points.size()!=pPlane2Points.size()||pPlane1Points.size()!=4)
             throw std::exception("Homography vectors must have 4 points each.");
-        evaluateHomography();
+        evaluateHomography(pPlane1Points,pPlane2Points);
     }
 
     Homography(Homography &anotherHomography){
-        plane1Points=anotherHomography.plane1Points;
-        plane2Points=anotherHomography.plane2Points;
         homographyMatrix=anotherHomography.homographyMatrix;
         inverseHomographyMatrix=anotherHomography.inverseHomographyMatrix;
     }
@@ -51,15 +45,9 @@ public:
         return inverseHomographyMatrix;
     }
 
-    std::vector<cv::Point2f> getPlane1Points(){
-        return plane1Points;
-    }
-
-    std::vector<cv::Point2f> getPlane2Points(){
-        return plane2Points;
-    }
 private:
-    void evaluateHomography(){
+    void evaluateHomography(std::vector<cv::Point2f> plane1Points,
+                            std::vector<cv::Point2f> plane2Points){
         homographyMatrix=cv::getPerspectiveTransform(plane1Points,plane2Points);
         inverseHomographyMatrix=homographyMatrix.inv();
     }

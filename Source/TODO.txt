@@ -1,1 +1,4 @@
 -For release include OpenCV3 in subfolder (header files and required dll files).
+
+class mainwindow
+-add qstatus bar to output applied operations
