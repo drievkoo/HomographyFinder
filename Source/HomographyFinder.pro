@@ -18,7 +18,9 @@ LIBS += -LC:\\Developer\\opencv3\\opencv\\build\\x86\\vc12\\lib   \
 -lopencv_world300d
 
 SOURCES += main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    foundhomographydialog.cpp \
+    perspectivesettingsdialog.cpp
 
 HEADERS  += mainwindow.h\
          homography.h \
@@ -26,14 +28,22 @@ HEADERS  += mainwindow.h\
     virtualgrid.h \
     homographyfinder.h \
     homographybuilder.h \
-    griddrawer.h \
     keyshortcutbinding.h \
     iprojection.h \
     igriddrawer.h \
-    abstractgriddrawer.h
+    abstractgriddrawer.h \
+    planeparallel.h \
+    griddraweropenglwidget.h \
+    abstractgriddrawerunittest.h \
+    foundhomographydialog.h \
+    perspectivesettingsdialog.h
 
-FORMS    += mainwindow.ui
+#    griddraweropengl.h \
 
-DISTFILES += \
-    INSTALL.txt \
-    TODO.txt
+FORMS    += mainwindow.ui \
+    foundhomographydialog.ui \
+    perspectivesettingsdialog.ui
+
+DISTFILES += INSTALL.txt \
+    TODO.txt \
+    BUGS.txt

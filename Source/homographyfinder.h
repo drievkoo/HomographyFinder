@@ -6,20 +6,22 @@
 #include "homographybuilder.h"
 #include "igriddrawer.h"
 #include "iprojection.h"
+#include "abstractgriddrawer.h"
 
 class HomographyFinder{
     VirtualGrid grid;
     IGridDrawer *gridDrawer;
     IProjection *projector;
     cv::Size imageSize;
-    cv::Point3d cameraTranslation;
-    cv::Point3d cameraRotation;
+    cv::Point3d cameraLocation;
+    cv::Point3d cameraOrientation;
     const double denseFactor;
+
 
 public:
     HomographyFinder(IGridDrawer *pGridDrawer,IProjection *pProjector):
-    denseFactor(2.){
-        resetCameraRotationAndTranslation();
+    denseFactor(2.),grid(cv::Point3d(0,0,0)){
+        setCameraLocationAndOrientation(cv::Point3d(0,0,20),cv::Point3d(0.,0.,0.));
         gridDrawer=pGridDrawer;
         projector=pProjector;
         if(gridDrawer==NULL)
@@ -32,63 +34,85 @@ public:
 
     }
 
-    void resetCameraRotationAndTranslation(){
-        cameraTranslation=cv::Point3d(0.,0.,0.);
-        cameraRotation=cv::Point3d(0.,0.,0.);
+    VirtualGrid getGrid(){
+        return grid;
+    }
+
+    void setCameraLocationAndOrientation(cv::Point3d newCameraLocation,
+    cv::Point3d newCameraOrientation){
+        cameraLocation=newCameraLocation;
+        cameraOrientation=newCameraOrientation;
+    }
+
+    cv::Point3d getCameraOrientation(){
+        return cameraOrientation;
+    }
+
+    cv::Point3d getCameraLocation(){
+        return cameraLocation;
     }
 
     void rotateCameraAroundXAxis(double angleInDegrees){
-        cameraRotation.x+=angleInDegrees;
+        //cameraOrientation=AbstractGridDrawer::calculateOrientationVector(cameraOrientation,
+        //    cv::Point3d(angleInDegrees,0,0));
+        cameraOrientation.x+=angleInDegrees;
     }
 
     void rotateCameraAroundYAxis(double angleInDegrees){
-        cameraRotation.y+=angleInDegrees;
+        //cameraOrientation=AbstractGridDrawer::calculateOrientationVector(cameraOrientation,
+        //    cv::Point3d(0,angleInDegrees,0));
+        cameraOrientation.y+=angleInDegrees;
     }
 
     void rotateCameraAroundZAxis(double angleInDegrees){
-        cameraRotation.z+=angleInDegrees;
+        //cameraOrientation=AbstractGridDrawer::calculateOrientationVector(cameraOrientation,
+        //    cv::Point3d(0,0,angleInDegrees));
+        cameraOrientation.z+=angleInDegrees;
     }
 
-    void translateCamera(cv::Point3d delta){
-        cameraTranslation+=delta;
+    void translateCamera(cv::Point3d deltaInUnits){
+       // int unitInPixels=getUnitSizeInPixels();
+        cameraLocation+=cv::Point3d(deltaInUnits.x,
+            deltaInUnits.y,deltaInUnits.z);
     }
 
     void shiftGridLeft(int shiftInPixels){
-        virtualGrid.translateInPixels(cv::Point(shiftInPixels,0));
+        grid.translateInPixels(cv::Point(shiftInPixels,0));
     }
 
     void shiftGridRight(int shiftInPixels){
-        virtualGrid.translateInPixels(cv::Point(-shiftInPixels,0));
+        grid.translateInPixels(cv::Point(-shiftInPixels,0));
     }
 
     void shiftGridUp(int shiftInPixels){
-        virtualGrid.translateInPixels(cv::Point(0,shiftInPixels));
+        grid.translateInPixels(cv::Point(0,shiftInPixels));
     }
 
     void shiftGridDown(int shiftInPixels){
-        virtualGrid.translateInPixels(cv::Point(0,-shiftInPixels));
+        grid.translateInPixels(cv::Point(0,-shiftInPixels));
     }
 
     void moreDenseGrid(){
-        virtualGrid.rebuildMoreDense(denseFactor);
+        grid.changeLinesDensity(denseFactor);
     }
 
     void lessDenseGrid(){
-        virtualGrid.rebuildLessDense(denseFactor);
+        grid.changeLinesDensity(1./denseFactor);
     }
 
     int getUnitSizeInPixels(){
-        return virtualGrid.getUnitInPixels();
+        return grid.getUnitInPixels();
     }
 
     Homography getCurrentHomographyMatrix(){
-        HomographyBuilder homographyBuilder(projector,grid,cameraRotation,
-            cameraTranslation);
+        HomographyBuilder homographyBuilder(projector,grid,imageSize,cameraOrientation,
+            cameraLocation);
         return homographyBuilder.toHomography();
     }
 
-    void drawVirtualGridOn(cv::Mat image){
-        gridDrawer->drawGrid(image,grid,cameraRotation,cameraTranslation);
+    cv::Mat drawVirtualGridOn(cv::Mat image){
+        gridDrawer->setCameraLocationAndOrientation(cameraLocation,cameraOrientation);
+        return gridDrawer->drawGrid(image,grid);
     }
 
 private:

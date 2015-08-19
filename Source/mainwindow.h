@@ -9,6 +9,9 @@
 #include <QFileDialog>
 #include <opencv2/highgui/highgui.hpp>
 #include <QMessageBox>
+#include "griddraweropenglwidget.h"
+#include "foundhomographydialog.h"
+#include "perspectivesettingsdialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -30,6 +33,7 @@ class MainWindow : public QMainWindow
                   SHIFT_LINES_UP,SHIFT_LINES_DOWN};
     KeyShortcutBinding<keyAction> keyBindings;
     cv::Mat image;
+    GridDrawerOpenGLWidget graphicsRender;
     bool emitKeyHit;
 public:
     explicit MainWindow(QWidget *parent = 0):QMainWindow(parent),
@@ -40,6 +44,7 @@ public:
         connect(ui->actionOpen_image,SIGNAL(triggered()),this,SLOT(openImage()));
         connect(ui->actionAbout,SIGNAL(triggered()),this,SLOT(about()));
         emitKeyHit=false;
+        graphicsRender.resize(1000,1000);
     }
 
     ~MainWindow(){
@@ -87,10 +92,16 @@ private slots:
         }catch(cv::Exception &e){
             return;
         }
-        homographyFinder=new HomographyFinder(image.size());
+        graphicsRender.clearCanvas();
+        homographyFinder=new HomographyFinder(&graphicsRender,&graphicsRender);
+        homographyFinder->setCameraLocationAndOrientation(cv::Point3i(0,0,20),cv::Point3d(0,0,0));
+        AbstractGridDrawer::PerspectiveSettings perspectiveSettings=graphicsRender.getPerspectiveSettings();
+        perspectiveSettings.changeAspectRatio(double(image.size().width)/image.size().height);
+        graphicsRender.setNewPerspective(perspectiveSettings,image.size());
         //update UI
         ui->loadedImagePathEdit->setText(filePath);
         ui->gridUnitSizeEdit->setText(QString("%1").arg(homographyFinder->getUnitSizeInPixels()));
+        ui->perspectiveSettingsEdit->setText(graphicsRender.getPerspectiveSettings().toString());
         updateImage();
     }
 
@@ -101,9 +112,8 @@ private slots:
     void keyHit(QKeyEvent &event){
         if(homographyFinder==NULL)
             return;
-        double rotationAngleInRadians=(ui->angleDegreeSpinBox->value()*CV_PI)/180.;
+        double rotationAngle=ui->angleDegreeSpinBox->value();
         double translationStepInUnits=ui->translationStepSpinBox->value();
-        double linesShiftStep=ui->gridLinesShiftStepSpinBox->value();
         keyAction action;
         try{
             action=keyBindings.getKeyAction(&event);
@@ -112,98 +122,111 @@ private slots:
         }
         if(action==ROTATE_X_CLKWISE){
             ui->statusBar->showMessage("ROTATE_X_CLKWISE");
-            homographyFinder->rotateGridAroundZAxis(rotationAngleInRadians);
+            homographyFinder->rotateCameraAroundXAxis(rotationAngle);
         }else if(action==ROTATE_X_COUNTER_CLKWISE){
             ui->statusBar->showMessage("ROTATE_X_COUNTER_CLKWISE");
-            homographyFinder->rotateGridAroundZAxis(-rotationAngleInRadians);
+            homographyFinder->rotateCameraAroundXAxis(-rotationAngle);
         }else if(action==ROTATE_Z_CLKWISE){
             ui->statusBar->showMessage("ROTATE_Z_CLKWISE");
-            homographyFinder->rotateGridAroundXAxis(rotationAngleInRadians);
+            homographyFinder->rotateCameraAroundZAxis(rotationAngle);
         }else if(action==ROTATE_Z_COUNTER_CLKWISE){
             ui->statusBar->showMessage("ROTATE_Z_COUNTER_CLKWISE");
-            homographyFinder->rotateGridAroundXAxis(-rotationAngleInRadians);
+            homographyFinder->rotateCameraAroundZAxis(-rotationAngle);
         }else if(action==ROTATE_Y_CLKWISE){
             ui->statusBar->showMessage("ROTATE_Y_CLKWISE");
-            homographyFinder->rotateGridAroundYAxis(rotationAngleInRadians);
+            homographyFinder->rotateCameraAroundYAxis(rotationAngle);
         }else if(action==ROTATE_Y_COUNTER_CLKWISE){
             ui->statusBar->showMessage("ROTATE_Y_COUNTER_CLKWISE");
-            homographyFinder->rotateGridAroundYAxis(-rotationAngleInRadians);
+            homographyFinder->rotateCameraAroundYAxis(-rotationAngle);
         }else if(action==TRANSLATE_X_POSITIVE){
             ui->statusBar->showMessage("TRANSLATE_X_POSITIVE");
-            homographyFinder->translate(cv::Point3f(translationStepInUnits,0,0));
+            homographyFinder->translateCamera(cv::Point3f(translationStepInUnits,0,0));
         }else if(action==TRANSLATE_X_NEGATIVE){
             ui->statusBar->showMessage("TRANSLATE_X_NEGATIVE");
-            homographyFinder->translate(cv::Point3f(-translationStepInUnits,0,0));
+            homographyFinder->translateCamera(cv::Point3f(-translationStepInUnits,0,0));
         }else if(action==TRANSLATE_Y_POSITIVE){
             ui->statusBar->showMessage("TRANSLATE_Y_POSITIVE");
-            homographyFinder->translate(cv::Point3f(0,translationStepInUnits,0));
+            homographyFinder->translateCamera(cv::Point3f(0,translationStepInUnits,0));
         }else if(action==TRANSLATE_Y_NEGATIVE){
             ui->statusBar->showMessage("TRANSLATE_Y_NEGATIVE");
-            homographyFinder->translate(cv::Point3f(0,-translationStepInUnits,0));
+            homographyFinder->translateCamera(cv::Point3f(0,-translationStepInUnits,0));
         }else if(action==TRANSLATE_Z_POSITIVE){
             ui->statusBar->showMessage("TRANSLATE_Z_POSITIVE");
-            homographyFinder->translate(cv::Point3f(0,0,translationStepInUnits));
+            homographyFinder->translateCamera(cv::Point3f(0,0,translationStepInUnits));
         }else if(action==TRANSLATE_Z_NEGATIVE){
             ui->statusBar->showMessage("TRANSLATE_Z_NEGATIVE");
-            homographyFinder->translate(cv::Point3f(0,0,-translationStepInUnits));
+            homographyFinder->translateCamera(cv::Point3f(0,0,-translationStepInUnits));
         }else if(action==DENSITY_MORE){
             ui->statusBar->showMessage("DENSITY_MORE");
             homographyFinder->moreDenseGrid();
         }else if(action==DENSITY_LESS){
             ui->statusBar->showMessage("DENSITY_LESS");
             homographyFinder->lessDenseGrid();
-        }else if(action==SHIFT_LINES_LEFT){
-            ui->statusBar->showMessage("SHIFT_LINES_LEFT");
-            homographyFinder->shiftGridLeft(linesShiftStep);
-        }else if(action==SHIFT_LINES_RIGHT){
-            ui->statusBar->showMessage("SHIFT_LINES_RIGHT");
-            homographyFinder->shiftGridRight(linesShiftStep);
-        }else if(action==SHIFT_LINES_UP){
-            ui->statusBar->showMessage("SHIFT_LINES_UP");
-            homographyFinder->shiftGridUp(linesShiftStep);
-        }else if(action==SHIFT_LINES_DOWN){
-            ui->statusBar->showMessage("SHIFT_LINES_DOWN");
-            homographyFinder->shiftGridDown(linesShiftStep);
         }
         updateImage();
     }
     void on_getHomographyButton_clicked(){
+        if(homographyFinder==NULL)
+            return;
+        /*QMessageBox aboutDialog;
+        aboutDialog.setWindowTitle(QString("Homography"));
+        aboutDialog.setText(QString("<h2>Homography</h2><br>"+
+            homographyFinder->getCurrentHomographyMatrix().toString()));
+        aboutDialog.exec();*/
+        FoundHomographyDialog homographyResult(homographyFinder->getCurrentHomographyMatrix());
+        homographyResult.setModal(true);
+        homographyResult.exec();
+    }
 
+    void on_perspectiveSettingsButton_clicked(){
+        if(homographyFinder==NULL)
+            return;
+        double aspectRatio=(double)(image.size().width)/(double)(image.size().height);
+        PerspectiveSettingsDialog perspectiveSettings(graphicsRender.getPerspectiveSettings(),
+            aspectRatio);
+        perspectiveSettings.setModal(true);
+        perspectiveSettings.exec();
+        if(perspectiveSettings.operationCanceled())
+            return;
+        graphicsRender.setNewPerspective(perspectiveSettings.getPerspectiveSettings(),image.size());
+        ui->perspectiveSettingsEdit->setText(graphicsRender.getPerspectiveSettings().toString());
     }
 
 private:
     void bindDefaultKeyShortcuts(){
-        keyBindings.add(ROTATE_X_CLKWISE,"a");
-        keyBindings.add(ROTATE_X_COUNTER_CLKWISE,"q");
-        keyBindings.add(ROTATE_Y_CLKWISE,"s");
-        keyBindings.add(ROTATE_Y_COUNTER_CLKWISE,"w");
-        keyBindings.add(ROTATE_Z_CLKWISE,"d");
-        keyBindings.add(ROTATE_Z_COUNTER_CLKWISE,"e");
+        keyBindings.add(ROTATE_X_CLKWISE,"q");
+        keyBindings.add(ROTATE_X_COUNTER_CLKWISE,"a");
+        keyBindings.add(ROTATE_Y_CLKWISE,"w");
+        keyBindings.add(ROTATE_Y_COUNTER_CLKWISE,"s");
+        keyBindings.add(ROTATE_Z_CLKWISE,"e");
+        keyBindings.add(ROTATE_Z_COUNTER_CLKWISE,"d");
 
-        keyBindings.add(TRANSLATE_X_POSITIVE,"u");
-        keyBindings.add(TRANSLATE_X_NEGATIVE,"j");
-        keyBindings.add(TRANSLATE_Y_POSITIVE,"i");
-        keyBindings.add(TRANSLATE_Y_NEGATIVE,"k");
-        keyBindings.add(TRANSLATE_Z_POSITIVE,"o");
-        keyBindings.add(TRANSLATE_Z_NEGATIVE,"l");
+        keyBindings.add(TRANSLATE_X_POSITIVE,"f");
+        keyBindings.add(TRANSLATE_X_NEGATIVE,"h");
+        keyBindings.add(TRANSLATE_Y_POSITIVE,"g");
+        keyBindings.add(TRANSLATE_Y_NEGATIVE,"t");
+        keyBindings.add(TRANSLATE_Z_POSITIVE,"5");
+        keyBindings.add(TRANSLATE_Z_NEGATIVE,"b");
 
         keyBindings.add(DENSITY_MORE,"m");
-        keyBindings.add(DENSITY_LESS,"n");
-
-        keyBindings.add(SHIFT_LINES_LEFT,"f");
-        keyBindings.add(SHIFT_LINES_RIGHT,"h");
-        keyBindings.add(SHIFT_LINES_UP,"t");
-        keyBindings.add(SHIFT_LINES_DOWN,"g");
+        keyBindings.add(DENSITY_LESS,"l");
     }
 
     void updateImage(){
         cv::Mat imageWithGrid=image.clone();
-        homographyFinder->drawVirtualGridOn(imageWithGrid);
+        imageWithGrid=homographyFinder->drawVirtualGridOn(imageWithGrid);
         float fx=ui->imageLabel->frameSize().width()/float(imageWithGrid.cols);
         float fy=ui->imageLabel->frameSize().height()/float(imageWithGrid.rows);
         float f=cv::min(fx,fy);
         cv::resize(imageWithGrid,imageWithGrid,cv::Size(),f,f);
         ui->imageLabel->setPixmap(makeQPixmap(imageWithGrid));
+
+        //std::vector<cv::Point3d> gridCorners3D=homographyFinder->getGrid().getGridCornerPoints();
+        //cv::Point2d origin=graphicsRender.project(gridCorners3D[0],homographyFinder->getCameraOrientation(),
+        //    homographyFinder->getCameraLocation());
+        //imageWithGrid=image.clone();
+        //cv::circle(imageWithGrid,cv::Point2f(origin.x,image.size().height-origin.y),5,cv::Scalar(0,0,255));
+        //cv::imshow("found",imageWithGrid);
     }
 
     QPixmap makeQPixmap(cv::Mat frame){

@@ -1,9 +1,25 @@
 -For release include OpenCV3 in subfolder (header files and required dll files).
 
+project
+x change classes not to pass every time translation, rotation (will be stored in homography finder current state)
+
+
 class mainwindow
--add qstatus bar to output applied operations
++ centered image
+
+class abstractgriddrawer
+- change defaults to be protected
+- static constants to be initialized in abstractgrid .cpp file (not possible in .h file ?,
+    multiple references)
+- drawGrid draw grid on original image (not creating own)
 
 classes to be implemented:
--virtual grid
--abstractgriddrawer
--griddrawer
+- griddrawer
+    - implement drawing grid
+    - implement projection to image plane from world coordinate according to current homographyfinder
+        camera state
++ homographybuilder
+    + implement estimating homography
+
+class homographyfinder
+-remove getGrid

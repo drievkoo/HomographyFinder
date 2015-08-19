@@ -32,11 +32,17 @@
        <widget class="ControllableLabel" name="imageLabel">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>10</y>
-          <width>641</width>
-          <height>741</height>
+          <x>10</x>
+          <y>20</y>
+          <width>625</width>
+          <height>695</height>
          </rect>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>625</width>
+          <height>695</height>
+         </size>
         </property>
         <property name="mouseTracking">
          <bool>true</bool>
@@ -48,6 +54,30 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
+       <widget class="GridDrawerOpenGLWidget" name="widget" native="true">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>20</y>
+          <width>625</width>
+          <height>695</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>625</width>
+          <height>695</height>
+         </size>
+        </property>
+       </widget>
+       <zorder>widget</zorder>
+       <zorder>imageLabel</zorder>
       </widget>
      </item>
      <item>
@@ -90,19 +120,6 @@
          <string>Loaded image:</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="getHomographyButton">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>680</y>
-          <width>281</width>
-          <height>41</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Get current homography</string>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_17">
         <property name="geometry">
          <rect>
@@ -139,25 +156,25 @@
          </rect>
         </property>
         <property name="minimum">
-         <number>5</number>
+         <number>1</number>
         </property>
         <property name="maximum">
          <number>180</number>
         </property>
         <property name="singleStep">
-         <number>5</number>
+         <number>1</number>
         </property>
         <property name="value">
-         <number>45</number>
+         <number>2</number>
         </property>
        </widget>
        <widget class="QTabWidget" name="tabWidget">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>160</y>
+          <y>200</y>
           <width>281</width>
-          <height>511</height>
+          <height>471</height>
          </rect>
         </property>
         <property name="maximumSize">
@@ -313,7 +330,7 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>240</y>
+            <y>250</y>
             <width>251</width>
             <height>131</height>
            </rect>
@@ -384,6 +401,12 @@
            </property>
            <property name="maximum">
             <double>100.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.100000000000000</double>
            </property>
           </widget>
           <widget class="QLabel" name="label_25">
@@ -477,32 +500,32 @@
             <string>Translate in Z:</string>
            </property>
           </widget>
+          <widget class="QPushButton" name="getHomographyButton">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>100</y>
+             <width>281</width>
+             <height>41</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Get current homography</string>
+           </property>
+          </widget>
          </widget>
          <widget class="QGroupBox" name="groupBox_6">
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>370</y>
+            <y>390</y>
             <width>251</width>
-            <height>111</height>
+            <height>51</height>
            </rect>
           </property>
           <property name="title">
            <string>Grid manipulation</string>
           </property>
-          <widget class="QLabel" name="label_33">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>50</y>
-             <width>41</width>
-             <height>21</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Lines:</string>
-           </property>
-          </widget>
           <widget class="QLabel" name="label_34">
            <property name="geometry">
             <rect>
@@ -540,58 +563,6 @@
            </property>
            <property name="text">
             <string>less dense [n]</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_16">
-           <property name="geometry">
-            <rect>
-             <x>60</x>
-             <y>50</y>
-             <width>81</width>
-             <height>21</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>shit left [f]</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_18">
-           <property name="geometry">
-            <rect>
-             <x>150</x>
-             <y>50</y>
-             <width>81</width>
-             <height>21</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>shift right [h]</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_19">
-           <property name="geometry">
-            <rect>
-             <x>60</x>
-             <y>70</y>
-             <width>81</width>
-             <height>21</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>shift up [t]</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_22">
-           <property name="geometry">
-            <rect>
-             <x>150</x>
-             <y>70</y>
-             <width>81</width>
-             <height>21</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>shift down [g]</string>
            </property>
           </widget>
          </widget>
@@ -785,38 +756,12 @@
             <x>10</x>
             <y>370</y>
             <width>251</width>
-            <height>111</height>
+            <height>61</height>
            </rect>
           </property>
           <property name="title">
            <string>Grid manipulation</string>
           </property>
-          <widget class="QPushButton" name="pushButton_19">
-           <property name="geometry">
-            <rect>
-             <x>160</x>
-             <y>80</y>
-             <width>75</width>
-             <height>23</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Shift down</string>
-           </property>
-          </widget>
-          <widget class="QPushButton" name="pushButton_20">
-           <property name="geometry">
-            <rect>
-             <x>70</x>
-             <y>50</y>
-             <width>75</width>
-             <height>23</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Shift left</string>
-           </property>
-          </widget>
           <widget class="QPushButton" name="pushButton_21">
            <property name="geometry">
             <rect>
@@ -843,19 +788,6 @@
             <string>More dense</string>
            </property>
           </widget>
-          <widget class="QPushButton" name="pushButton_23">
-           <property name="geometry">
-            <rect>
-             <x>160</x>
-             <y>50</y>
-             <width>75</width>
-             <height>23</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Shift right</string>
-           </property>
-          </widget>
           <widget class="QLabel" name="label_31">
            <property name="geometry">
             <rect>
@@ -867,32 +799,6 @@
            </property>
            <property name="text">
             <string>Density:</string>
-           </property>
-          </widget>
-          <widget class="QPushButton" name="pushButton_24">
-           <property name="geometry">
-            <rect>
-             <x>70</x>
-             <y>80</y>
-             <width>75</width>
-             <height>23</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Shift up</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_32">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>50</y>
-             <width>41</width>
-             <height>21</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Lines:</string>
            </property>
           </widget>
          </widget>
@@ -937,44 +843,44 @@
          <string>Grid unit size:</string>
         </property>
        </widget>
-       <widget class="QLabel" name="label_28">
+       <widget class="QGroupBox" name="groupBox">
         <property name="geometry">
          <rect>
-          <x>180</x>
+          <x>10</x>
           <y>130</y>
-          <width>47</width>
-          <height>21</height>
+          <width>281</width>
+          <height>61</height>
          </rect>
         </property>
-        <property name="text">
-         <string>unit(s)</string>
+        <property name="title">
+         <string>Perspective settings:</string>
         </property>
-       </widget>
-       <widget class="QLabel" name="label_30">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>130</y>
-          <width>81</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Grid shift step:</string>
-        </property>
-       </widget>
-       <widget class="QDoubleSpinBox" name="gridLinesShiftStepSpinBox">
-        <property name="geometry">
-         <rect>
-          <x>101</x>
-          <y>130</y>
-          <width>61</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="maximum">
-         <double>100.000000000000000</double>
-        </property>
+        <widget class="QLineEdit" name="perspectiveSettingsEdit">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>161</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="perspectiveSettingsButton">
+         <property name="geometry">
+          <rect>
+           <x>190</x>
+           <y>30</y>
+           <width>75</width>
+           <height>23</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Change</string>
+         </property>
+        </widget>
        </widget>
       </widget>
      </item>
@@ -1034,6 +940,12 @@
    <class>ControllableLabel</class>
    <extends>QLabel</extends>
    <header location="global">controllablelabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>GridDrawerOpenGLWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">griddraweropenglwidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

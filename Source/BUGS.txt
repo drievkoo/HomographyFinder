@@ -1,0 +1,12 @@
+KNOWN BUGS:
+
+17.8.2015
+    only part of loaded image is rendered with grid, aspect ratio of image size always 1,
+    red part (not rendered grid space) occupies image area dispite aspect ratio set to image
+    aspect ratio
+
+17.8.2015
+    when new image is loaded old image remain visible as background
+
+17.8.2015
+    whole window is not resizable aware, widgets do not change size when window resized
